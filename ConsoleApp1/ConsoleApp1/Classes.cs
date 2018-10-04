@@ -10,5 +10,6 @@ namespace ConsoleApp1
     {
         public string name;
         public List<People> students { get; set; } = new List<People>();
+     
     }
 }
