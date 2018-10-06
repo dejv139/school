@@ -11,5 +11,10 @@ namespace Books
         public string URI { get; set; }
 
         public int SizeMB { get; set; }
+
+        public int getSize()
+        {
+            return SizeMB;
+        }
     }
 }

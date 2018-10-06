@@ -15,9 +15,7 @@ namespace Books
     {
         static void Main(string[] args)
         {
-            ConsoleKeyInfo key;
-            int menuItem = 0;
-            string[] menuContent = { "Vypiš všechny knihy", "ahoj", "ahoj" };
+            string[] menuContent = { "Vypiš všechny E-knihy", "ahoj", "ahoj2" };
 
             Menu menu = new Menu();
             menu.MenuContent = menuContent;
@@ -58,41 +56,14 @@ namespace Books
             string json = JsonConvert.SerializeObject(books, settings);
             File.WriteAllText("jsonFile.json", json);
             string jsonFromFile = File.ReadAllText("jsonFile.json");
-            List<Book> booksFromFile = JsonConvert.DeserializeObject<List<Book>>(jsonFromFile , settings);
+            List<Book> booksFromFile = JsonConvert.DeserializeObject<List<Book>>(jsonFromFile, settings);
             //
 
             Console.WriteLine("Press any key to continue");
 
             menu.GetMenu(menu.MenuContent);
-            if (menu.GetCurrent() == 0)
-            {
-                Console.WriteLine("{0,20}{1,20}",
-                "Název knihy",
-                "Autor");
-                Console.WriteLine("------------------------------------------------------------------");
-                for (int i = 0; i <= booksFromFile.Count - 1; i++)
-                {
-                    Console.WriteLine("{0,20}{1,20}{2,20}",
-                    booksFromFile[i].Name,
-                    booksFromFile[i].author.FristName,
-                    booksFromFile[i].author.LastName);
-                }
-            }
-
-
-            for(int i = 0; i <= booksFromFile.Count-1; i++)
-            {
-                if(booksFromFile[i] is EBook)
-                {
-                    Console.WriteLine("{0,20}{1,20}{2,20}{3,20}",
-                    booksFromFile[i].Name,
-                    booksFromFile[i].author.FristName,
-                    booksFromFile[i].author.LastName,
-                    //Issue
-                    booksFromFile[i]./*SizeMB*/
-                    );
-                }
-            }
+            menu.GetResult(booksFromFile, menu.GetCurrent());
+            
         }
     }
 }
