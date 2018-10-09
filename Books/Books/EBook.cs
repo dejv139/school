@@ -12,9 +12,5 @@ namespace Books
 
         public int SizeMB { get; set; }
 
-        public int getSize()
-        {
-            return SizeMB;
-        }
     }
 }
