@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using EPPlus.DataExtractor;
+using Newtonsoft.Json;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +69,62 @@ namespace Books
             books.Add(book6);
             books.Add(book7);
 
-            List<PaperBook> DiscontinuousBooks = new List<PaperBook>();
+
+            var p = new ExcelPackage();
+            string url = @"C:\Users\David Motúz\source\repos\school\Knihy.xlsx";
+            //A workbook must have at least on cell, so lets add one... 
+            var ws = p.Workbook.Worksheets.Add("MySheet");
+            //To set values in the spreadsheet use the Cells indexer.
+
+            ws.Cells["A1"].Value = "Type";
+            ws.Cells["B1"].Value = "Název knihy";
+            ws.Cells["C1"].Value = "Křesní jméno";
+            ws.Cells["D1"].Value = "Přijmení";
+            ws.Cells["E1"].Value = "ISBN";
+            ws.Cells["F1"].Value = "Váha";
+            ws.Cells["G1"].Value = "Dostupnost";
+            ws.Cells["H1"].Value = "URI";
+            ws.Cells["I1"].Value = "Velikost";
+            ws.Cells["A1:J1"].Style.Font.Bold = true;
+            ws.Cells["A1:H1"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+            int counter = 2;
+            foreach(Book book in books)
+            {
+                //uložit do prvního sloupce typ
+                ws.Cells["B" + counter].Value = book.Name;
+                ws.Cells["C" + counter].Value = book.author.FristName + " " + book.author.LastName;
+                ws.Cells["D" + counter].Value = book.ISBN;                    
+                if(book is PaperBook)
+                {
+                    ws.Cells["E" + counter].Value = ((PaperBook)book).Weight + " g";
+                    ws.Cells["F" + counter].Value = ((PaperBook)book).Stock + " ks";
+                }
+                else
+                {
+                    ws.Cells["G" + counter].Value = ((EBook)book).URI;
+                    ws.Cells["H" + counter].Value = ((EBook)book).SizeMB + " MB";
+                }
+                counter++;
+            }
+            ws.Cells["A1:H"+counter].AutoFitColumns();
+            //Save the new workbook. We haven't specified the filename so use the Save as method.
+            p.SaveAs(new FileInfo(url));
+            List<Book> booksFromExcel = new List<Book>();
+
+            using (var package = new ExcelPackage(new FileInfo(url)))
+            {
+                booksFromExcel = package.Workbook.Worksheets["MySheet"]
+                    .Extract<Book>()
+                    .WithProperty(c => c.Name, "B")
+                    .WithProperty(c => c.ISBN, "C")
+                    .GetData(1, 6)
+                    .ToList();
+            }
+
+            foreach( Book prvek in booksFromExcel)
+            {
+                Console.WriteLine(prvek.Name + prvek.ISBN);
+            }
 
             // Aby zustaly zděděné classy ( musí se vždy napsat při serializaci/deserializaci )
             var settings = new JsonSerializerSettings()
@@ -152,7 +210,9 @@ namespace Books
 
 
             }
+
         }
+
 
             
 
